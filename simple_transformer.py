@@ -29,15 +29,7 @@ class SimpleTransformer(nn.Module):
         # Positional encoding
         self.register_buffer('pos_embedding', self._get_pos_embedding(seq_len, d_model))
 
-        # Transformer encoder
-        # encoder_layer = nn.TransformerEncoderLayer(
-        #     d_model=d_model,
-        #     nhead=nhead,
-        #     dim_feedforward=d_model * 4,
-        #     dropout=dropout,
-        #     batch_first=True
-        # )
-        # self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+
         self.layers = nn.ModuleList([
             FinancialTransformerLayer(d_model, nhead, dropout)
             for _ in range(num_layers)
@@ -233,80 +225,7 @@ def train_model(X_train, y_train, X_val, y_val, feat_dim, seq_len, device, epoch
     return best_model_state, best_val_loss, model
 
 
-# def evaluate_model(model, X_test, y_test, seq_len, device, batch):
-#     """Evaluate the model on the test data."""
-#
-#     def create_sequences(X, y, overlap=False):
-#         Xs, ys = [], []
-#         step = 1 if overlap else seq_len
-#         for i in range(0, len(X) - seq_len + 1, step):
-#             Xs.append(X[i:i + seq_len])
-#             ys.append(y[i + seq_len - 1])
-#         return np.array(Xs), np.array(ys)
-#
-#     # Create sequences and tensors
-#     X_test_seq, y_test_seq = create_sequences(X_test, y_test)
-#     test_loader = DataLoader(
-#         TensorDataset(
-#             torch.tensor(X_test_seq, dtype=torch.float32),
-#             torch.tensor(y_test_seq, dtype=torch.float32)
-#         ),
-#         batch_size=batch,
-#         shuffle=False
-#     )
-#
-#     model.eval()
-#     predictions, targets = [], []
-#
-#     with torch.no_grad():
-#         for xb, yb in test_loader:
-#             xb, yb = xb.to(device), yb.to(device)
-#             pred_mean, _ = model(xb)  # We only need mean for point prediction metrics
-#             predictions.append(pred_mean.squeeze().cpu().numpy())
-#             targets.append(yb.cpu().numpy())
-#
-#     predictions = np.concatenate(predictions)
-#     targets = np.concatenate(targets)
-#
-#     # Calculate all metrics
-#     mse = np.mean((predictions - targets) ** 2)
-#     mae = np.mean(np.abs(predictions - targets))
-#     rmse = np.sqrt(mse)
-#     directional_acc = np.mean(np.sign(predictions) == np.sign(targets)) * 100
-#     r2 = r2_score(targets, predictions)
-#
-#     # Print comprehensive report
-#     print("\n" + "=" * 50)
-#     print("Evaluation Metrics:")
-#     print(f"MSE:  {mse:.6f}")
-#     print(f"MAE:  {mae:.6f}")
-#     print(f"RMSE: {rmse:.6f}")
-#     print(f"R²:   {r2:.6f}")
-#     print(f"Directional Accuracy: {directional_acc:.2f}%")
-#     print("=" * 50 + "\n")
-#
-#     print("Predictions vs Targets Statistics:")
-#     stats = pd.DataFrame({
-#         'Predictions': predictions,
-#         'Targets': targets
-#     }).describe()
-#     print(stats)
-#
-#     print("\nFirst 20 Predictions vs Targets:")
-#     for i in range(min(20, len(predictions))):
-#         print(f"[{i}] Pred: {predictions[i]:.4f} | Target: {targets[i]:.4f} | "
-#               f"Error: {predictions[i] - targets[i]:.4f} | "
-#               f"Direction: {'✓' if np.sign(predictions[i]) == np.sign(targets[i]) else '✗'}")
-#
-#     return {
-#         'mse': mse,
-#         'mae': mae,
-#         'rmse': rmse,
-#         'r2': r2,
-#         'directional_acc': directional_acc,
-#         'predictions': predictions,
-#         'targets': targets
-#     }
+
 def evaluate_model(model, X_test, y_test, seq_len, device, batch):
     """Evaluate the model on the test data using a sliding window of step 1"""
     Xs, ys = [], []
@@ -463,7 +382,6 @@ def main():
     # print(f"MSE:  {results['mse']:.6f}")
     # print(f"MAE:  {results['mae']:.6f}")
     # print(f"RMSE: {results['rmse']:.6f}")
-    # print(f"R²:   {results['r2']:.6f}")
     # print(f"Directional Accuracy: {results['directional_acc']:.2f}%")
 
     # Save model artifacts
