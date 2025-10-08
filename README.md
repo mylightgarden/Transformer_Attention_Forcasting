@@ -27,3 +27,4 @@ sign penalty = ReLU(−sign(pred) · target).mean()
 Four key metrics commonly used to evaluate financial stock prediction models are MSE, MAE, RMSE, and directional accuracy, which respectively measure error magnitude, average deviation, interpretability, and trend prediction accuracy.
 
 A weight analysis was performed on the transformer's input projection layer to identify which features it relies on most. By averaging the absolute weights across embedding dimensions, I found that the model heavily emphasizes the K–D difference, day-of-week, and 5-day volatility, indicating a preference for short-term momentum and weekly patterns. In contrast, raw volume and its z-score were least influential, suggesting volume has a minor role in the model’s decision-making.
+![feature_importances](feature_importances.png)
